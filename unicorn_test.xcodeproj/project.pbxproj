@@ -95,7 +95,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		6152F15B21782AFB006765AD /* sample_arm64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sample_arm64; sourceTree = BUILT_PRODUCTS_DIR; };
+		6152F15B21782AFB006765AD /* unicorn_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unicorn_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		6152F15E21782AFB006765AD /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		6152F16621782B4A006765AD /* libunicorn.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libunicorn.a; path = unicorn/libunicorn.a; sourceTree = "<group>"; };
 		6152F16D21785D76006765AD /* libaarch64-softmmu.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libaarch64-softmmu.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -213,7 +213,7 @@
 		6152F15C21782AFB006765AD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6152F15B21782AFB006765AD /* sample_arm64 */,
+				6152F15B21782AFB006765AD /* unicorn_test */,
 				6152F16D21785D76006765AD /* libaarch64-softmmu.a */,
 				6152F17721785DA3006765AD /* libunicorn_static.a */,
 			);
@@ -421,9 +421,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		6152F15A21782AFB006765AD /* sample_arm64 */ = {
+		6152F15A21782AFB006765AD /* unicorn_test */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6152F16221782AFB006765AD /* Build configuration list for PBXNativeTarget "sample_arm64" */;
+			buildConfigurationList = 6152F16221782AFB006765AD /* Build configuration list for PBXNativeTarget "unicorn_test" */;
 			buildPhases = (
 				6152F15721782AFB006765AD /* Sources */,
 				6152F15821782AFB006765AD /* Frameworks */,
@@ -433,9 +433,9 @@
 			);
 			dependencies = (
 			);
-			name = sample_arm64;
+			name = unicorn_test;
 			productName = sample_arm64;
-			productReference = 6152F15B21782AFB006765AD /* sample_arm64 */;
+			productReference = 6152F15B21782AFB006765AD /* unicorn_test */;
 			productType = "com.apple.product-type.tool";
 		};
 		6152F16C21785D76006765AD /* aarch64-softmmu */ = {
@@ -492,7 +492,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 6152F15621782AFB006765AD /* Build configuration list for PBXProject "sample_arm64" */;
+			buildConfigurationList = 6152F15621782AFB006765AD /* Build configuration list for PBXProject "unicorn_test" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -504,7 +504,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6152F15A21782AFB006765AD /* sample_arm64 */,
+				6152F15A21782AFB006765AD /* unicorn_test */,
 				6152F16C21785D76006765AD /* aarch64-softmmu */,
 				6152F17621785DA3006765AD /* unicorn_static */,
 			);
@@ -655,7 +655,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = /Volumes/extData/vm/sample_arm64/unicorn/include;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/unicorn/include\"",
+					"\"$(SRCROOT)/unicorn/qemu\"",
+					"\"$(SRCROOT)/unicorn/qemu/include\"",
+					"\"$(SRCROOT)/unicorn/qemu/tcg\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -709,7 +714,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = /Volumes/extData/vm/sample_arm64/unicorn/include;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/unicorn/include\"",
+					"\"$(SRCROOT)/unicorn/qemu\"",
+					"\"$(SRCROOT)/unicorn/qemu/include\"",
+					"\"$(SRCROOT)/unicorn/qemu/tcg\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -865,7 +875,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6152F15621782AFB006765AD /* Build configuration list for PBXProject "sample_arm64" */ = {
+		6152F15621782AFB006765AD /* Build configuration list for PBXProject "unicorn_test" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6152F16021782AFB006765AD /* Debug */,
@@ -874,7 +884,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6152F16221782AFB006765AD /* Build configuration list for PBXNativeTarget "sample_arm64" */ = {
+		6152F16221782AFB006765AD /* Build configuration list for PBXNativeTarget "unicorn_test" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6152F16321782AFB006765AD /* Debug */,

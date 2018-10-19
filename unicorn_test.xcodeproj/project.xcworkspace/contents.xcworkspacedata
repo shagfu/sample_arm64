@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:sample_arm64.xcodeproj">
+      location = "self:/Volumes/extData/vm/sample_arm64/unicorn_test.xcodeproj">
    </FileRef>
 </Workspace>
