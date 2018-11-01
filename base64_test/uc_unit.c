@@ -8,12 +8,11 @@
 #include <stdio.h>
 #include "uc_unit.h"
 int mem_off=0;
-void adrp_relo_function(uc_engine *uc,uint64_t pc_address,char* str)
+void adrp_relo_function(uc_engine *uc,uint64_t pc_address,int regid,char* str,int len)
 {
-    int len =strlen(str);
     int64_t mem_address=get_mem_addres(len);
     uc_mem_write(uc, mem_address, str, len);
-    uc_reg_write(uc, UC_ARM64_REG_X1,&mem_address);
+    uc_reg_write(uc, regid,&mem_address);
     int64_t pc=pc_address+8;
     uc_reg_write(uc, UC_ARM64_REG_PC, &pc);
 }
@@ -127,4 +126,64 @@ char* read_file(char* path, uint32_t* len)
     fread(code, 1, *len, fp);
     fclose(fp);
     return code;
+}
+void hook_code(uc_engine *uc, uint64_t pc_address, uint32_t size, void *user_data)
+{
+    uc_err err;
+    printf(">>> Tracing hook_code at 0x%"PRIx64 ", instruction size = 0x%x\n", pc_address, size);
+    switch (pc_address) {
+            
+        case 0x90C://strlen
+        case 0xA08:
+        {
+            bl_strlen_function(uc,pc_address);
+            break;
+        }
+        case 0xA10:
+        {
+            char *strda="==";
+            adrp_relo_function(uc,pc_address,strda,UC_ARM64_REG_X1,strlen(strda));
+            break;
+        }
+        case 0xA1C://strstr
+        {
+            bl_strstr_function(uc, pc_address);
+            break;
+        }
+        case 0xA28:
+        case 0xA50:
+        {
+            int64_t x20=0;
+            uc_reg_read(uc, UC_ARM64_REG_X20,&x20);
+            x20=x20&0xFF;
+            uc_reg_write(uc,UC_ARM64_REG_X20,&x20);
+            break;
+        }
+        case 0xA48://strchr
+        {
+            bl_strchr_function(uc, pc_address);
+            break;
+        }
+        case 0x938://malloc
+        case 0xA70:
+        {
+            bl_malloc_function(uc, pc_address);
+            break;
+        }
+        case 0x940:
+        case 0xA74:
+        {
+            //size 大小错误  修正
+            int64_t x0=0;
+            int64_t x21=0;
+            err=uc_reg_read(uc, UC_ARM64_REG_X0, &x0);//读取需要分配的大小
+            err=uc_reg_read(uc, UC_ARM64_REG_X21, &x21);//读取需要分配的大小
+            x21=x21&0xFF;
+            uc_reg_write(uc, UC_ARM64_REG_X21, &x21);
+            printf("---test size == x0 == %llx   x21===%llx \n",x0,x21);
+            break;
+        }
+        default:
+            break;
+    }
 }

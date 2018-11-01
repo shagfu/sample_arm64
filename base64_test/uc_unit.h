@@ -16,10 +16,14 @@ typedef uint64_t float64;
 #define ELF_HEADER_SIZE  0x40
 
 #define STACK_ADDR  0x8000000
+#define STACK_ADDR1  0x9000000
+
 #define STACK_SIZE  1024*1024
 #define ADDRESS_CODE 0x00000
+
 #define MEM_ADDR    STACK_ADDR+STACK_SIZE
 
+#define MEM_ADDR1    STACK_ADDR1+STACK_SIZE
 
 #define F(x,y,z) ((x & y) | (~x & z))
 #define G(x,y,z) ((x & z) | (y & ~z))
@@ -42,8 +46,7 @@ void bl_malloc_function(uc_engine *uc,uint64_t pc_address);
 void bl_strstr_function(uc_engine *uc,uint64_t pc_address);
 void bl_strchr_function(uc_engine *uc,uint64_t pc_address);
 void bl_memcpu_function(uc_engine *uc,uint64_t pc_address);
-void adrp_relo_function(uc_engine *uc,uint64_t pc_address,char* str);
-
-
+void adrp_relo_function(uc_engine *uc,uint64_t pc_address,int regid,char* str,int len);
+void hook_code(uc_engine *uc, uint64_t pc_address, uint32_t size, void *user_data);
 
 #endif /* uc_unit_hpp */
