@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "uc_unit.h"
 int mem_off=0;
+int m_statck=2;
 void adrp_relo_function(uc_engine *uc,uint64_t pc_address,int regid,char* str,int len)
 {
     int64_t mem_address=get_mem_addres(len);
@@ -82,6 +83,23 @@ void bl_strstr_function(uc_engine *uc,uint64_t pc_address)
     int64_t pc=pc_address+4;
     uc_reg_write(uc, UC_ARM64_REG_PC, &pc);
 }
+void bl_memset_function(uc_engine *uc,uint64_t pc_address)
+{
+    int64_t x0,x1,x2;
+    uc_reg_read(uc, UC_ARM64_REG_X0, &x0);//dest
+    uc_reg_read(uc, UC_ARM64_REG_X1, &x1);//src
+    uc_reg_read(uc, UC_ARM64_REG_X2, &x2);//len
+    //uc_reg_write(uc, UC_ARM64_REG_X0, &x1);
+    
+    char tmp1[0x100]={0};
+    char tmp2[0x100]={0};
+    uc_mem_read(uc, x0, tmp1, 0x100);
+    //uc_mem_read(uc, x1, tmp2, 0x100);
+    uc_mem_write(uc, x0, tmp2, x2);
+    uint64_t pc = pc_address;
+    pc += 4;
+    uc_reg_write(uc, UC_ARM64_REG_PC, &pc);
+}
 void bl_strchr_function(uc_engine *uc,uint64_t pc_address)
 {
     int64_t x0;
@@ -113,16 +131,90 @@ int64_t get_mem_addres(int nsize)
     mem_off+=0x10;
     return ret;
 }
+
+uc_engine * call_function(function_info * funcinfo)
+{
+    uc_engine *uc_new;
+    uc_hook  trace2;
+    uc_err err;
+    int64_t address_code=ADDRESS_CODE+STACK_INC*(m_statck-1);
+    // Initialize emulator in ARM mode
+    err = uc_open(UC_ARCH_ARM64, UC_MODE_ARM, &uc_new);
+    if (err) {
+        printf("Failed on uc_open() with error returned: %u (%s)\n",
+               err, uc_strerror(err));
+        return 0;
+    }
+    // 分配代码内存
+    err=uc_mem_map(uc_new, address_code, 10 * 1024 * 1024, UC_PROT_ALL);
+    if(err){
+        printf("Failed on uc_mem_map() with error returned: %u (%s)\n",
+               err, uc_strerror(err));
+    }
+    err=uc_mem_write(uc_new, address_code, (const void*)funcinfo->code_addr, funcinfo->code_len);
+
+    //分配栈内存
+     int64_t function_stack=STACK_ADDR+m_statck*STACK_INC;
+    err=uc_mem_map(uc_new,function_stack , STACK_SIZE, UC_PROT_ALL);
+    if(err){
+        printf("Failed on uc_mem_map() with error returned: %u (%s)\n",
+               err, uc_strerror(err));
+    }
+    uint64_t sp_address=function_stack+(STACK_SIZE/2);
+    err=uc_reg_write(uc_new,  UC_ARM64_REG_SP, &sp_address);//分配栈内存
+    if (err) {
+        printf("Failed on uc_mem_write() with error returned: %u (%s)\n",
+               err, uc_strerror(err));
+        return 0;
+    }
+    
+    //设置一个指令执行回调用，该回调函数会在指令执行前被调用
+    uc_hook_add(uc_new, &trace2, UC_HOOK_CODE, funcinfo->code_hook, NULL, address_code+funcinfo->code_begin, address_code+funcinfo->code_end);
+    //分配函数内存地址
+    int64_t function_mem_addr=function_stack+STACK_SIZE;
+    err=uc_mem_map(uc_new,function_mem_addr,STACK_SIZE*8, UC_PROT_ALL);
+    if(err){
+        printf("Failed on uc_mem_map() with error returned: %u (%s)\n",
+               err, uc_strerror(err));
+    }
+    //传参数
+    int64_t address=0;
+    for (int i=0; i<funcinfo->arg_number; i++) {
+        address=function_mem_addr+0x100*i;
+        int64_t *arg=(int64_t*)(funcinfo->args[i]);
+        if(funcinfo->args_size[i]==0x40000)
+        {
+             err=uc_reg_write(uc_new, UC_ARM64_REG_X0+i, arg);
+        }else
+        {
+            
+            err=uc_mem_write(uc_new, address,(const void*)arg,funcinfo->args_size[i]);//写内存
+             err=uc_reg_write(uc_new, UC_ARM64_REG_X0+i, &address);
+        }
+ 
+        
+    }
+    funcinfo->func_memaddr=function_mem_addr;
+    err = uc_emu_start(uc_new, address_code+funcinfo->code_begin, address_code+funcinfo->code_end, 0, 0);
+    if (err) {
+        printf("************* !!!!!!!!!!! function mem_addr == %llx\n",function_mem_addr);
+        printf("Failed on uc_emu_start() with error returned: %u (%s)\n",
+               err, uc_strerror(err));
+        return 0;
+    }
+    m_statck++;
+    return uc_new;
+}
 char* read_file(char* path, uint32_t* len)
 {
     FILE* fp = fopen(path, "rb");
     if (fp == NULL)
         return 0;
     fseek(fp, 0, SEEK_END);
-    *len = ftell(fp);
+    *len = (uint32_t)ftell(fp);
     fseek(fp, 0, SEEK_SET);
     char* code = (char*)malloc(*len);
-    memset(code, 0, *len);
+    memset((void*)code, 0, (unsigned long)*len);
     fread(code, 1, *len, fp);
     fclose(fp);
     return code;

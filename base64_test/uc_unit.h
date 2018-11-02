@@ -13,40 +13,38 @@
 #include <stdio.h>
 #include <unicorn/unicorn.h>
 typedef uint64_t float64;
+#define ADDRESS_CODE 0x00000
 #define ELF_HEADER_SIZE  0x40
 
-#define STACK_ADDR  0x8000000
-#define STACK_ADDR1  0x9000000
-
+#define STACK_ADDR  0x04000000
+#define STACK_INC   0x01000000
 #define STACK_SIZE  1024*1024
-#define ADDRESS_CODE 0x00000
-
 #define MEM_ADDR    STACK_ADDR+STACK_SIZE
 
-#define MEM_ADDR1    STACK_ADDR1+STACK_SIZE
 
-#define F(x,y,z) ((x & y) | (~x & z))
-#define G(x,y,z) ((x & z) | (y & ~z))
-#define H(x,y,z) (x^y^z)
-#define I(x,y,z) (y ^ (x | ~z))
-
-
-/**************************************
- *向右环移n个单位
- * ************************************/
-#define ROTATE_LEFT(x,n) ((x << n) | (x >> (32-n)))
-#define FF(a,b,c,d,x,s,ac) { a += F(b,c,d) + x + ac;  a = ROTATE_LEFT(a,s); a += b; }
-#define GG(a,b,c,d,x,s,ac) { a += G(b,c,d) + x + ac;  a = ROTATE_LEFT(a,s); a += b; }
-#define HH(a,b,c,d,x,s,ac) { a += H(b,c,d) + x + ac;  a = ROTATE_LEFT(a,s); a += b; }
-#define II(a,b,c,d,x,s,ac) { a += I(b,c,d) + x + ac;  a = ROTATE_LEFT(a,s); a += b; }
+#pragma pack(push)
+typedef struct function_info_t
+{
+    int64_t func_memaddr;
+    int64_t code_addr;
+    int64_t code_len;
+    int64_t code_begin;
+    int64_t code_end;
+    void *  code_hook;
+    int   arg_number;
+    int64_t  args[10];
+    int32_t  args_size[10];
+}function_info;
+#pragma pack(pop)
 char* read_file(char* path, uint32_t* len);
 int64_t get_mem_addres(int nsize);
 void bl_strlen_function(uc_engine *uc,uint64_t pc_address);
+void bl_memset_function(uc_engine *uc,uint64_t pc_address);
 void bl_malloc_function(uc_engine *uc,uint64_t pc_address);
 void bl_strstr_function(uc_engine *uc,uint64_t pc_address);
 void bl_strchr_function(uc_engine *uc,uint64_t pc_address);
 void bl_memcpu_function(uc_engine *uc,uint64_t pc_address);
 void adrp_relo_function(uc_engine *uc,uint64_t pc_address,int regid,char* str,int len);
 void hook_code(uc_engine *uc, uint64_t pc_address, uint32_t size, void *user_data);
-
+uc_engine * call_function(function_info * funcinfo);
 #endif /* uc_unit_hpp */
