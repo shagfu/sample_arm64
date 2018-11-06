@@ -1,0 +1,109 @@
+ ld_i32 tmp0,env,$0xfffffffffffffff4
+ movi_i32 tmp1,$0x0
+ brcond_i32 tmp0,tmp1,ne,$0x0
+ movi_i32 tmp0,$0x4
+ movi_i32 tmp1,$0x2
+ movi_i64 tmp2,$0x100802200
+ movi_i64 tmp3,$0x8f8		
+ call uc_tracecode,$0x0,$0,tmp0,tmp1,tmp2,tmp3  		第一条指令
+
+
+ ld_i32 tmp4,env,$0xfffffffffffffff4
+ movi_i32 tmp5,$0x0
+ brcond_i32 tmp4,tmp5,ne,$0x0
+ nopn $0x2,$0x2
+ movi_i64 tmp7,$0xffffffffffffffd0
+ add_i64 tmp6,sp,tmp7
+ qemu_st_i64 x21,tmp6,leq,$0x1
+ ld_i32 tmp4,env,$0xfffffffffffffff4
+ movi_i32 tmp5,$0x0
+ brcond_i32 tmp4,tmp5,ne,$0x0
+ mov_i64 sp,tmp6
+ movi_i32 tmp4,$0x4  
+ movi_i32 tmp5,$0x2
+ movi_i64 tmp6,$0x100802200
+ movi_i64 tmp7,$0x8fc
+ call uc_tracecode,$0x0,$0,tmp4,tmp5,tmp6,tmp7  		第二条指令
+
+
+
+ ld_i32 tmp8,env,$0xfffffffffffffff4
+ movi_i32 tmp9,$0x0
+ brcond_i32 tmp8,tmp9,ne,$0x0
+ nopn $0x2,$0x2
+ movi_i64 tmp11,$0x10
+ add_i64 tmp10,sp,tmp11
+ qemu_st_i64 x20,tmp10,leq,$0x1
+ ld_i32 tmp8,env,$0xfffffffffffffff4
+ movi_i32 tmp9,$0x0
+ brcond_i32 tmp8,tmp9,ne,$0x0
+ movi_i64 tmp11,$0x8
+ add_i64 tmp10,tmp10,tmp11
+ qemu_st_i64 x19,tmp10,leq,$0x1
+ ld_i32 tmp8,env,$0xfffffffffffffff4
+ movi_i32 tmp9,$0x0
+ brcond_i32 tmp8,tmp9,ne,$0x0
+ movi_i32 tmp8,$0x4   指令大小
+ movi_i32 tmp9,$0x2   hook 类型
+ movi_i64 tmp10,$0x100802200    uc 地址
+ movi_i64 tmp11,$0x900     pc指令
+ call uc_tracecode,$0x0,$0,tmp8,tmp9,tmp10,tmp11		 第三条指令
+
+
+
+ ld_i32 tmp12,env,$0xfffffffffffffff4
+ movi_i32 tmp13,$0x0
+ brcond_i32 tmp12,tmp13,ne,$0x0
+ nopn $0x2,$0x2
+ movi_i64 tmp15,$0x20
+ add_i64 tmp14,sp,tmp15
+ qemu_st_i64 x29,tmp14,leq,$0x1
+ ld_i32 tmp12,env,$0xfffffffffffffff4
+ movi_i32 tmp13,$0x0
+ brcond_i32 tmp12,tmp13,ne,$0x0
+ movi_i64 tmp15,$0x8
+ add_i64 tmp14,tmp14,tmp15
+ qemu_st_i64 lr,tmp14,leq,$0x1
+ ld_i32 tmp12,env,$0xfffffffffffffff4
+ movi_i32 tmp13,$0x0
+ brcond_i32 tmp12,tmp13,ne,$0x0
+ movi_i32 tmp12,$0x4
+ movi_i32 tmp13,$0x2
+ movi_i64 tmp14,$0x100802200
+ movi_i64 tmp15,$0x904
+ call uc_tracecode,$0x0,$0,tmp12,tmp13,tmp14,tmp15    第四条指令
+
+ ld_i32 tmp16,env,$0xfffffffffffffff4
+ movi_i32 tmp17,$0x0
+ brcond_i32 tmp16,tmp17,ne,$0x0
+ movi_i64 tmp19,$0x20
+ add_i64 tmp18,sp,tmp19
+ mov_i64 x29,tmp18  //ADD             X29, SP, #0x20
+ movi_i32 tmp16,$0x4
+ movi_i32 tmp17,$0x2
+ movi_i64 tmp18,$0x100802200   
+ movi_i64 tmp19,$0x908  //pc 
+ call uc_tracecode,$0x0,$0,tmp16,tmp17,tmp18,tmp19     第五条指令
+
+ ld_i32 tmp20,env,$0xfffffffffffffff4
+ movi_i32 tmp21,$0x0
+ brcond_i32 tmp20,tmp21,ne,$0x0
+ mov_i64 x19,x0     //MOV             X19, str
+ movi_i32 tmp20,$0x4
+ movi_i32 tmp21,$0x2
+ movi_i64 tmp22,$0x100802200
+ movi_i64 tmp23,$0x90c
+ call uc_tracecode,$0x0,$0,tmp20,tmp21,tmp22,tmp23
+
+
+ ld_i32 tmp24,env,$0xfffffffffffffff4
+ movi_i32 tmp25,$0x0
+ brcond_i32 tmp24,tmp25,ne,$0x0
+ movi_i64 lr,$0x910
+ goto_tb $0x0
+ movi_i64 pc,$0x840  //strlen
+
+ exit_tb $0x104000000
+ set_label $0x0
+ exit_tb $0x104000003
+ end 
